@@ -1,0 +1,5 @@
+/.venv
+/build
+/Calculator.spec
+/dist
+/normal.spec
