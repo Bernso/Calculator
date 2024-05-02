@@ -5,7 +5,6 @@ app = ctk.CTk()
 app.title("Calculator")
 app.geometry("280x320")
 
-messagebox.showinfo("Keybinds", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation")
 
 def calculate():
     try:
@@ -25,7 +24,14 @@ def addToEquation(letter):
         print("Added letter")
     except Exception as e:
         print(e)
-    
+
+def help():
+    try:
+        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation")
+        print("Help UI on screen")
+    except Exception as e:
+        print(e)
+
 
 def clearEquations(event):
     try:
@@ -45,8 +51,13 @@ def removeFromEquation():
         print(e)
     
 
+
+
 equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
 equation.grid(row=0, column=0, columnspan=4)
+
+helpButton = ctk.CTkButton(app, text="Help", command=help, width=40, height=20, font=('Calibri', 10, 'bold'))
+helpButton.place(x=235, y=5)
 
 app.bind('<space>', clearEquations)
 app.bind('1', lambda event: addToEquation("1")) 
