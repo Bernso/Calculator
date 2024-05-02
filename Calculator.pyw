@@ -35,6 +35,16 @@ def clearEquations(event):
         print(e)
 
 
+def removeFromEquation():
+    try:
+        textEquation = equation.cget('text')
+        textEquation = textEquation[:-1]
+        equation.configure(text=textEquation)
+        print("Removed letter")
+    except Exception as e:
+        print(e)
+    
+
 equation = ctk.CTkLabel(app, text="", width=280, height=75)
 equation.grid(row=0, column=0, columnspan=4)
 
@@ -54,6 +64,10 @@ app.bind('-', lambda event: addToEquation("-"))
 app.bind('/', lambda event: addToEquation("/")) 
 app.bind('*', lambda event: addToEquation("*"))
 app.bind('.', lambda event: addToEquation("."))
+app.bind('^', lambda event: addToEquation("**"))
+app.bind('<parenleft>', lambda event: addToEquation("("))
+app.bind('<parenright>', lambda event: addToEquation(")"))
+app.bind('<BackSpace>', lambda event: removeFromEquation())
 app.bind('<Return>', lambda event: calculate())
 
 
