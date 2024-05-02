@@ -8,23 +8,64 @@ app.geometry("310x360")
 
 
 def calculate():
-    equationToDo = equation.cget('text')
-    answer = str(eval(equationToDo))
-    equation.configure(text=answer)
+    try:
+        equationToDo = equation.cget('text')
+        answer = str(eval(equationToDo))
+        equation.configure(text=answer)
+        print("Successfully Calculated")
+    except Exception as e:
+        print(e)
 
 
 def addToEquation(letter):
-    textEquation = equation.cget('text')
-    textEquation += letter
-    equation.configure(text=textEquation)
-
+    try:
+        textEquation = equation.cget('text')
+        textEquation += letter
+        equation.configure(text=textEquation)
+        print("Added letter")
+    except Exception as e:
+        print(e)
+    
 
 def clearEquations(event):
-    equation.configure(text="")
-    print('Cleared Equations')
+    try:
+        equation.configure(text="")
+        print('Cleared Equations')
+    except Exception as e:
+        print(e)
+
+
+def removeFromEquation():
+    try:
+        textEquation = equation.cget('text')
+        textEquation = textEquation[:-1]
+        equation.configure(text=textEquation)
+        print("Removed letter")
+    except Exception as e:
+        print(e)
 
 
 app.bind('<space>', clearEquations)
+app.bind('1', lambda event: addToEquation("1")) 
+app.bind('2', lambda event: addToEquation("2")) 
+app.bind('3', lambda event: addToEquation("3")) 
+app.bind('4', lambda event: addToEquation("4")) 
+app.bind('5', lambda event: addToEquation("5")) 
+app.bind('6', lambda event: addToEquation("6")) 
+app.bind('7', lambda event: addToEquation("7")) 
+app.bind('8', lambda event: addToEquation("8")) 
+app.bind('9', lambda event: addToEquation("9")) 
+app.bind('0', lambda event: addToEquation("0")) 
+app.bind('+', lambda event: addToEquation("+")) 
+app.bind('-', lambda event: addToEquation("-")) 
+app.bind('/', lambda event: addToEquation("/")) 
+app.bind('*', lambda event: addToEquation("*"))
+app.bind('.', lambda event: addToEquation("."))
+app.bind('^', lambda event: addToEquation("**"))
+app.bind('<parenleft>', lambda event: addToEquation("("))
+app.bind('<parenright>', lambda event: addToEquation(")"))
+app.bind('<BackSpace>', lambda event: removeFromEquation())
+app.bind('<Return>', lambda event: calculate())
 
 equation = tk.Label(app, text="", width=30, height=5)
 equation.grid(row=0, column=0, columnspan=3)
