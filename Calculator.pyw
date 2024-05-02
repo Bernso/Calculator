@@ -131,4 +131,6 @@ multiply.grid(row=1, column=3, sticky='nswe', padx=5, pady=5)
 division = ctk.CTkButton(app, text="÷", command=lambda: addToEquation("/"), height=50, width=10, font=('Calibri', 20, 'bold'))
 division.grid(row=4, column=3, sticky='nswe', padx=5, pady=5)
 
-app.mainloop()
+
+if __name__ == "__main__":
+    app.mainloop()
