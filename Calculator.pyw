@@ -2,12 +2,14 @@ import customtkinter as ctk
 from tkinter import messagebox
 import pyperclip, re, sys
 
+
 app = ctk.CTk()
 app.title("Calculator")
 app.geometry("280x320")
 
 
 equation_index = 0
+
 
 def calculate():
     try:
@@ -29,6 +31,7 @@ def addToEquation(letter):
         print("Added letter")
     except Exception as e:
         print(e)
+
 
 def help():
     try:
@@ -84,6 +87,7 @@ def get_clipboard_content():
         print(f"Error accessing clipboard: {e}")
         return None
 
+
 def paste_clipboard_content():
     try:
         clipboard_content = get_clipboard_content()
@@ -94,13 +98,16 @@ def paste_clipboard_content():
     except Exception as e:
         print(e)
 
+
 sys.set_int_max_str_digits(1000000000)
+
 
 equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
 equation.grid(row=0, column=0, columnspan=4)
 
 helpButton = ctk.CTkButton(app, text="Help", command=help, width=40, height=20, font=('Calibri', 10, 'bold'))
 helpButton.place(x=235, y=5)
+
 
 app.bind('<space>', clearEquations)
 app.bind('<Left>', moveCursorLeft)
