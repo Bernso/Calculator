@@ -1,10 +1,13 @@
 import customtkinter as ctk
 from tkinter import messagebox
+import pyperclip, re, sys
 
 app = ctk.CTk()
 app.title("Calculator")
 app.geometry("280x320")
 
+
+equation_index = 0
 
 def calculate():
     try:
@@ -17,17 +20,19 @@ def calculate():
 
 
 def addToEquation(letter):
+    global equation_index
     try:
         textEquation = equation.cget('text')
-        textEquation += letter
+        textEquation = textEquation[:equation_index] + letter + textEquation[equation_index:]
         equation.configure(text=textEquation)
+        equation_index += 1
         print("Added letter")
     except Exception as e:
         print(e)
 
 def help():
     try:
-        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation")
+        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation\n\nPaste: Control + V to paste from the clipboard")
         print("Help UI on screen")
     except Exception as e:
         print(e)
@@ -42,16 +47,54 @@ def clearEquations(event):
 
 
 def removeFromEquation():
+    global equation_index
     try:
         textEquation = equation.cget('text')
-        textEquation = textEquation[:-1]
+        textEquation = textEquation[:equation_index-1] + textEquation[equation_index:]
         equation.configure(text=textEquation)
+        equation_index -= 1
         print("Removed letter")
     except Exception as e:
         print(e)
-    
 
 
+def moveCursorLeft(event):
+    global equation_index
+    equation_index = max(0, equation_index - 1)
+    print("Moved cursor left")
+
+
+def moveCursorRight(event):
+    global equation_index
+    text_length = len(equation.cget('text'))
+    equation_index = min(text_length, equation_index + 1)
+    print("Moved cursor right")
+
+
+
+def get_clipboard_content():
+    try:
+        clipboard_content = pyperclip.paste()
+        if clipboard_content and re.match(r'^-?\d+(\.\d+)?$', clipboard_content.strip()):
+            return clipboard_content.strip()  # Return only if clipboard content is numeric
+        else:
+            print("Clipboard content is not numeric")
+            return None
+    except pyperclip.PyperclipException as e:
+        print(f"Error accessing clipboard: {e}")
+        return None
+
+def paste_clipboard_content():
+    try:
+        clipboard_content = get_clipboard_content()
+        if clipboard_content is not None:
+            originalText = equation.cget('text')
+            equation.configure(text=originalText+clipboard_content)
+            print("Pasted clipboard content")
+    except Exception as e:
+        print(e)
+
+sys.set_int_max_str_digits(1000000000)
 
 equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
 equation.grid(row=0, column=0, columnspan=4)
@@ -60,6 +103,8 @@ helpButton = ctk.CTkButton(app, text="Help", command=help, width=40, height=20, 
 helpButton.place(x=235, y=5)
 
 app.bind('<space>', clearEquations)
+app.bind('<Left>', moveCursorLeft)
+app.bind('<Right>', moveCursorRight)
 app.bind('1', lambda event: addToEquation("1")) 
 app.bind('2', lambda event: addToEquation("2")) 
 app.bind('3', lambda event: addToEquation("3")) 
@@ -76,11 +121,12 @@ app.bind('/', lambda event: addToEquation("/"))
 app.bind('*', lambda event: addToEquation("*"))
 app.bind('.', lambda event: addToEquation("."))
 app.bind('^', lambda event: addToEquation("**"))
-app.bind('(', lambda event: addToEquation("("))
-app.bind(')', lambda event: addToEquation(")"))
+app.bind('=', lambda event: calculate())
+app.bind('<parenleft>', lambda event: addToEquation("("))
+app.bind('<parenright>', lambda event: addToEquation(")"))
 app.bind('<BackSpace>', lambda event: removeFromEquation())
 app.bind('<Return>', lambda event: calculate())
-
+app.bind('<Control-v>', lambda event: paste_clipboard_content())
 
 
 one = ctk.CTkButton(app, text="1", command=lambda: addToEquation("1"), height=50, width=10, font=('Calibri', 20, 'bold'))
