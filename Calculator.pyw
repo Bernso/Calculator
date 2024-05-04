@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+import sys
 
 app = ctk.CTk()
 app.title("Calculator")
@@ -69,7 +70,7 @@ def moveCursorRight(event):
     equation_index = min(text_length, equation_index + 1)
     print("Moved cursor right")
 
-
+sys.set_int_max_str_digits(1000000000)
 
 equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
 equation.grid(row=0, column=0, columnspan=4)
