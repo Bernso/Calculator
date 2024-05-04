@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
 import sys
+import pyperclip
 
 app = ctk.CTk()
 app.title("Calculator")
@@ -70,6 +71,26 @@ def moveCursorRight(event):
     equation_index = min(text_length, equation_index + 1)
     print("Moved cursor right")
 
+
+
+def get_clipboard_content():
+    try:
+        clipboard_content = pyperclip.paste()
+        return clipboard_content
+    except pyperclip.PyperclipException as e:
+        print(f"Error accessing clipboard: {e}")
+        return None
+
+def paste_clipboard_content():
+    try:
+        clipboard_content = get_clipboard_content()
+        if clipboard_content is not None:
+            originalText = equation.cget('text')
+            equation.configure(text=originalText+clipboard_content)
+            print("Pasted clipboard content")
+    except Exception as e:
+        print(e)
+
 sys.set_int_max_str_digits(1000000000)
 
 equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
@@ -97,11 +118,12 @@ app.bind('/', lambda event: addToEquation("/"))
 app.bind('*', lambda event: addToEquation("*"))
 app.bind('.', lambda event: addToEquation("."))
 app.bind('^', lambda event: addToEquation("**"))
+app.bind('=', lambda event: calculate())
 app.bind('<parenleft>', lambda event: addToEquation("("))
 app.bind('<parenright>', lambda event: addToEquation(")"))
 app.bind('<BackSpace>', lambda event: removeFromEquation())
 app.bind('<Return>', lambda event: calculate())
-
+app.bind('<Control-v>', lambda event: paste_clipboard_content())
 
 
 one = ctk.CTkButton(app, text="1", command=lambda: addToEquation("1"), height=50, width=10, font=('Calibri', 20, 'bold'))
