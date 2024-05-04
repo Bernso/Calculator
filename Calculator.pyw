@@ -1,7 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
-import sys
-import pyperclip
+import pyperclip, re, sys
 
 app = ctk.CTk()
 app.title("Calculator")
@@ -33,7 +32,7 @@ def addToEquation(letter):
 
 def help():
     try:
-        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation")
+        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation\n\nPaste: Control + V to paste from the clipboard")
         print("Help UI on screen")
     except Exception as e:
         print(e)
@@ -76,7 +75,11 @@ def moveCursorRight(event):
 def get_clipboard_content():
     try:
         clipboard_content = pyperclip.paste()
-        return clipboard_content
+        if clipboard_content and re.match(r'^-?\d+(\.\d+)?$', clipboard_content.strip()):
+            return clipboard_content.strip()  # Return only if clipboard content is numeric
+        else:
+            print("Clipboard content is not numeric")
+            return None
     except pyperclip.PyperclipException as e:
         print(f"Error accessing clipboard: {e}")
         return None
