@@ -1,117 +1,72 @@
 import customtkinter as ctk
 from tkinter import messagebox
-import pyperclip, re, sys
-
+import re
 
 app = ctk.CTk()
 app.title("Calculator")
-app.geometry("280x315")
+app.geometry("280x320")
 
-
-equation_index = 0
-
+history = []
 
 def calculate():
     try:
         equationToDo = equation.cget('text')
         answer = str(eval(equationToDo))
-        equation.configure(text=answer)
+        result.configure(text=answer)
+        history.append((equationToDo, answer))  # Add calculation to history
         print("Successfully Calculated")
+    except ZeroDivisionError:
+        messagebox.showerror("Error", "Cannot divide by zero")
     except Exception as e:
-        print(e)
-
+        messagebox.showerror("Error", f"An error occurred: {e}")
 
 def addToEquation(letter):
-    global equation_index
     try:
-        textEquation = equation.cget('text')
-        textEquation = textEquation[:equation_index] + letter + textEquation[equation_index:]
-        equation.configure(text=textEquation)
-        equation_index += 1
-        print("Added letter")
+        if re.match(r'^[\d+\-*/.()^]+$', letter):  # Validate input
+            textEquation = equation.cget('text')
+            textEquation += letter
+            equation.configure(text=textEquation)
+            print("Added letter")
+        else:
+            messagebox.showwarning("Invalid Input", "Invalid character entered")
     except Exception as e:
         print(e)
-
 
 def help():
     try:
-        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation\n\nPaste: Control + V to paste from the clipboard (must be numbers, no strings allowed)")
+        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn or equals: Do the calculation")
         print("Help UI on screen")
     except Exception as e:
         print(e)
 
-
 def clearEquations(event):
     try:
         equation.configure(text="")
+        result.configure(text="")
         print('Cleared Equations')
     except Exception as e:
         print(e)
 
-
 def removeFromEquation():
-    global equation_index
     try:
         textEquation = equation.cget('text')
-        textEquation = textEquation[:equation_index-1] + textEquation[equation_index:]
+        textEquation = textEquation[:-1]
         equation.configure(text=textEquation)
-        equation_index -= 1
         print("Removed letter")
     except Exception as e:
         print(e)
 
 
-def moveCursorLeft(event):
-    global equation_index
-    equation_index = max(0, equation_index - 1)
-    print("Moved cursor left")
+equation = ctk.CTkLabel(app, text="", width=220, height=75, font=('Calibri', 20, 'bold'))
+equation.grid(row=0, column=0, columnspan=3)
 
-
-def moveCursorRight(event):
-    global equation_index
-    text_length = len(equation.cget('text'))
-    equation_index = min(text_length, equation_index + 1)
-    print("Moved cursor right")
-
-
-
-def get_clipboard_content():
-    try:
-        clipboard_content = pyperclip.paste()
-        if clipboard_content and re.match(r'^-?\d+(\.\d+)?$', clipboard_content.strip()):
-            return clipboard_content.strip()  # Return only if clipboard content is numeric
-        else:
-            print("Clipboard content is not numeric")
-            return None
-    except pyperclip.PyperclipException as e:
-        print(f"Error accessing clipboard: {e}")
-        return None
-
-
-def paste_clipboard_content():
-    try:
-        clipboard_content = get_clipboard_content()
-        if clipboard_content is not None:
-            originalText = equation.cget('text')
-            equation.configure(text=originalText+clipboard_content)
-            print("Pasted clipboard content")
-    except Exception as e:
-        print(e)
-
-
-sys.set_int_max_str_digits(1000000000)
-
-
-equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
-equation.grid(row=0, column=0, columnspan=4)
+result = ctk.CTkLabel(app, text="", width=60, height=75, font=('Calibri', 20, 'bold'))
+result.grid(row=0, column=3, sticky="w")
 
 helpButton = ctk.CTkButton(app, text="Help", command=help, width=40, height=20, font=('Calibri', 10, 'bold'))
 helpButton.place(x=235, y=5)
 
-
 app.bind('<space>', clearEquations)
-app.bind('<Left>', moveCursorLeft)
-app.bind('<Right>', moveCursorRight)
 app.bind('1', lambda event: addToEquation("1")) 
 app.bind('2', lambda event: addToEquation("2")) 
 app.bind('3', lambda event: addToEquation("3")) 
@@ -128,62 +83,59 @@ app.bind('/', lambda event: addToEquation("/"))
 app.bind('*', lambda event: addToEquation("*"))
 app.bind('.', lambda event: addToEquation("."))
 app.bind('^', lambda event: addToEquation("**"))
+app.bind('(', lambda event: addToEquation("("))
+app.bind(')', lambda event: addToEquation(")"))
 app.bind('=', lambda event: calculate())
-app.bind('<parenleft>', lambda event: addToEquation("("))
-app.bind('<parenright>', lambda event: addToEquation(")"))
 app.bind('<BackSpace>', lambda event: removeFromEquation())
 app.bind('<Return>', lambda event: calculate())
-app.bind('<Control-v>', lambda event: paste_clipboard_content())
 
-
-one = ctk.CTkButton(app, text="1", command=lambda: addToEquation("1"), height=50, width=10, font=('Calibri', 20, 'bold'))
+one = ctk.CTkButton(app, text="1", command=lambda letter="1": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 one.grid(row=1, column=0, sticky='nswe', padx=5, pady=5)
 
-two = ctk.CTkButton(app, text="2", command=lambda: addToEquation("2"), height=50, width=10, font=('Calibri', 20, 'bold'))
+two = ctk.CTkButton(app, text="2", command=lambda letter="2": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 two.grid(row=1, column=1, sticky='nswe', padx=5, pady=5)
 
-three = ctk.CTkButton(app, text="3", command=lambda: addToEquation("3"), height=50, width=10, font=('Calibri', 20, 'bold'))
+three = ctk.CTkButton(app, text="3", command=lambda letter="3": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 three.grid(row=1, column=2, sticky='nswe', padx=5, pady=5)
 
-four = ctk.CTkButton(app, text="4", command=lambda: addToEquation("4"), height=50, width=10, font=('Calibri', 20, 'bold'))
+four = ctk.CTkButton(app, text="4", command=lambda letter="4": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 four.grid(row=2, column=0, sticky='nswe', padx=5, pady=5)
 
-five = ctk.CTkButton(app, text="5", command=lambda: addToEquation("5"), height=50, width=10, font=('Calibri', 20, 'bold'))
+five = ctk.CTkButton(app, text="5", command=lambda letter="5": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 five.grid(row=2, column=1, sticky='nswe', padx=5, pady=5)
 
-six = ctk.CTkButton(app, text="6", command=lambda: addToEquation("6"), height=50, width=10, font=('Calibri', 20, 'bold'))
+six = ctk.CTkButton(app, text="6", command=lambda letter="6": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 six.grid(row=2, column=2, sticky='nswe', padx=5, pady=5)
 
-seven = ctk.CTkButton(app, text="7", command=lambda: addToEquation("7"), height=50, width=10, font=('Calibri', 20, 'bold'))
+seven = ctk.CTkButton(app, text="7", command=lambda letter="7": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 seven.grid(row=3, column=0, sticky='nswe', padx=5, pady=5)
 
-eight = ctk.CTkButton(app, text="8", command=lambda: addToEquation("8"), height=50, width=10, font=('Calibri', 20, 'bold'))
+eight = ctk.CTkButton(app, text="8", command=lambda letter="8": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 eight.grid(row=3, column=1, sticky='nswe', padx=5, pady=5)
 
-nine = ctk.CTkButton(app, text="9", command=lambda: addToEquation("9"), height=50, width=10, font=('Calibri', 20, 'bold'))
+nine = ctk.CTkButton(app, text="9", command=lambda letter="9": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 nine.grid(row=3, column=2, sticky='nswe', padx=5, pady=5)
 
-zero = ctk.CTkButton(app, text="0", command=lambda: addToEquation("0"), height=50, width=10, font=('Calibri', 20, 'bold'))
+zero = ctk.CTkButton(app, text="0", command=lambda letter="0": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 zero.grid(row=4, column=0, sticky='nswe', padx=5, pady=5)
 
-decimal = ctk.CTkButton(app, text=".", command=lambda: addToEquation("."), height=50, width=10, font=('Calibri', 20, 'bold'))
+decimal = ctk.CTkButton(app, text=".", command=lambda letter=".": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 decimal.grid(row=4, column=1, sticky='nswe', padx=5, pady=5)
 
 enter = ctk.CTkButton(app, text="=", command=calculate, height=50, width=10, font=('Calibri', 20, 'bold'))
 enter.grid(row=4, column=2, sticky='nswe', padx=5, pady=5)
 
-addition = ctk.CTkButton(app, text="+", command=lambda: addToEquation("+"), height=50, width=10, font=('Calibri', 20, 'bold'))
+addition = ctk.CTkButton(app, text="+", command=lambda letter="+": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 addition.grid(row=2, column=3, sticky='nswe', padx=5, pady=5)
 
-subtract = ctk.CTkButton(app, text="-", command=lambda: addToEquation("-"), height=50, width=10, font=('Calibri', 20, 'bold'))
+subtract = ctk.CTkButton(app, text="-", command=lambda letter="-": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 subtract.grid(row=3, column=3, sticky='nswe', padx=5, pady=5)
 
-multiply = ctk.CTkButton(app, text="×", command=lambda: addToEquation("*"), height=50, width=10, font=('Calibri', 20, 'bold'))
+multiply = ctk.CTkButton(app, text="×", command=lambda letter="*": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 multiply.grid(row=1, column=3, sticky='nswe', padx=5, pady=5)
 
-division = ctk.CTkButton(app, text="÷", command=lambda: addToEquation("/"), height=50, width=10, font=('Calibri', 20, 'bold'))
+division = ctk.CTkButton(app, text="÷", command=lambda letter="/": addToEquation(letter), height=50, width=10, font=('Calibri', 20, 'bold'))
 division.grid(row=4, column=3, sticky='nswe', padx=5, pady=5)
-
 
 if __name__ == "__main__":
     app.mainloop()
