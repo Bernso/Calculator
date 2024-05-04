@@ -27,7 +27,7 @@ def addToEquation(letter):
 
 def help():
     try:
-        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation")
+        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn or equals: Do the calculation")
         print("Help UI on screen")
     except Exception as e:
         print(e)
@@ -78,9 +78,9 @@ app.bind('.', lambda event: addToEquation("."))
 app.bind('^', lambda event: addToEquation("**"))
 app.bind('(', lambda event: addToEquation("("))
 app.bind(')', lambda event: addToEquation(")"))
+app.bind('=', lambda event: calculate())
 app.bind('<BackSpace>', lambda event: removeFromEquation())
 app.bind('<Return>', lambda event: calculate())
-
 
 
 one = ctk.CTkButton(app, text="1", command=lambda: addToEquation("1"), height=50, width=10, font=('Calibri', 20, 'bold'))
