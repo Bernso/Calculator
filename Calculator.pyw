@@ -5,7 +5,7 @@ import pyperclip, re, sys
 
 app = ctk.CTk()
 app.title("Calculator")
-app.geometry("280x320")
+app.geometry("280x315")
 
 
 equation_index = 0
