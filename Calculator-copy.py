@@ -1,26 +1,29 @@
 import customtkinter as ctk
 from tkinter import messagebox
+import sys
 
 app = ctk.CTk()
 app.title("Calculator")
 app.geometry("280x320")
 
+equation_index = 0
 
 def calculate():
     try:
-        equationToDo = equation.cget('text')
+        equationToDo = equation.get()
         answer = str(eval(equationToDo))
-        equation.configure(text=answer)
+        equation.delete(0, ctk.END)
+        equation.insert(0, answer)
         print("Successfully Calculated")
     except Exception as e:
         print(e)
 
 
 def addToEquation(letter):
+    global equation_index
     try:
-        textEquation = equation.cget('text')
-        textEquation += letter
-        equation.configure(text=textEquation)
+        equation.insert(equation_index, letter)
+        equation_index += 1
         print("Added letter")
     except Exception as e:
         print(e)
@@ -35,25 +38,44 @@ def help():
 
 def clearEquations(event):
     try:
-        equation.configure(text="")
+        equation.delete(0, ctk.END)
         print('Cleared Equations')
     except Exception as e:
         print(e)
 
 
 def removeFromEquation():
+    global equation_index
     try:
-        textEquation = equation.cget('text')
-        textEquation = textEquation[:-1]
-        equation.configure(text=textEquation)
-        print("Removed letter")
+        if equation_index > 0:
+            equation.delete(equation_index - 1)
+            equation_index -= 1
+            print("Removed letter")
     except Exception as e:
         print(e)
-    
 
 
+def moveCursorLeft(event):
+    global equation_index
+    if equation_index > 0:
+        equation_index -= 1
+        print("Moved cursor left")
+    else:
+        print("Cursor already at beginning")
 
-equation = ctk.CTkLabel(app, text="", width=280, height=75, font=('Calibri', 20, 'bold'))
+
+def moveCursorRight(event):
+    global equation_index
+    if equation_index < len(equation.get()):
+        equation_index += 1
+        print("Moved cursor right")
+    else:
+        print("Cursor already at end")
+
+
+sys.set_int_max_str_digits(10000)
+
+equation = ctk.CTkEntry(app, width=280, height=75,font=('Calibri', 20, 'bold'))
 equation.grid(row=0, column=0, columnspan=4)
 
 helpButton = ctk.CTkButton(app, text="Help", command=help, width=40, height=20, font=('Calibri', 10, 'bold'))
@@ -76,11 +98,12 @@ app.bind('/', lambda event: addToEquation("/"))
 app.bind('*', lambda event: addToEquation("*"))
 app.bind('.', lambda event: addToEquation("."))
 app.bind('^', lambda event: addToEquation("**"))
-app.bind('(', lambda event: addToEquation("("))
-app.bind(')', lambda event: addToEquation(")"))
+app.bind('<parenleft>', lambda event: addToEquation("("))
+app.bind('<parenright>', lambda event: addToEquation(")"))
 app.bind('<BackSpace>', lambda event: removeFromEquation())
 app.bind('<Return>', lambda event: calculate())
-
+app.bind('<Left>', moveCursorLeft)
+app.bind('<Right>', moveCursorRight)
 
 
 one = ctk.CTkButton(app, text="1", command=lambda: addToEquation("1"), height=50, width=10, font=('Calibri', 20, 'bold'))
@@ -130,7 +153,6 @@ multiply.grid(row=1, column=3, sticky='nswe', padx=5, pady=5)
 
 division = ctk.CTkButton(app, text="÷", command=lambda: addToEquation("/"), height=50, width=10, font=('Calibri', 20, 'bold'))
 division.grid(row=4, column=3, sticky='nswe', padx=5, pady=5)
-
 
 if __name__ == "__main__":
     app.mainloop()
