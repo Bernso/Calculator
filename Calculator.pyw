@@ -35,7 +35,7 @@ def addToEquation(letter):
 
 def help():
     try:
-        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation\n\nPaste: Control + V to paste from the clipboard")
+        messagebox.showinfo("Help (Keybinds)", "Spacebar: Clear the current equation\n\nPowers: Press the asterisk twice and then the power e.g. 3**2 would be 3 squared\n\nParentheses: Press the left parenthesis and then the right parenthesis e.g. ()\n\nBackspace: To delete the previous character\n\nReturn: Do the calculation\n\nPaste: Control + V to paste from the clipboard (must be numbers, no strings allowed)")
         print("Help UI on screen")
     except Exception as e:
         print(e)
