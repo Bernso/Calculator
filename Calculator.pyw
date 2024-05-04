@@ -6,6 +6,8 @@ app.title("Calculator")
 app.geometry("280x320")
 
 
+equation_index = 0
+
 def calculate():
     try:
         equationToDo = equation.cget('text')
@@ -17,10 +19,12 @@ def calculate():
 
 
 def addToEquation(letter):
+    global equation_index
     try:
         textEquation = equation.cget('text')
-        textEquation += letter
+        textEquation = textEquation[:equation_index] + letter + textEquation[equation_index:]
         equation.configure(text=textEquation)
+        equation_index += 1
         print("Added letter")
     except Exception as e:
         print(e)
@@ -42,14 +46,28 @@ def clearEquations(event):
 
 
 def removeFromEquation():
+    global equation_index
     try:
         textEquation = equation.cget('text')
-        textEquation = textEquation[:-1]
+        textEquation = textEquation[:equation_index-1] + textEquation[equation_index:]
         equation.configure(text=textEquation)
+        equation_index -= 1
         print("Removed letter")
     except Exception as e:
         print(e)
-    
+
+
+def moveCursorLeft(event):
+    global equation_index
+    equation_index = max(0, equation_index - 1)
+    print("Moved cursor left")
+
+
+def moveCursorRight(event):
+    global equation_index
+    text_length = len(equation.cget('text'))
+    equation_index = min(text_length, equation_index + 1)
+    print("Moved cursor right")
 
 
 
@@ -60,6 +78,8 @@ helpButton = ctk.CTkButton(app, text="Help", command=help, width=40, height=20, 
 helpButton.place(x=235, y=5)
 
 app.bind('<space>', clearEquations)
+app.bind('<Left>', moveCursorLeft)
+app.bind('<Right>', moveCursorRight)
 app.bind('1', lambda event: addToEquation("1")) 
 app.bind('2', lambda event: addToEquation("2")) 
 app.bind('3', lambda event: addToEquation("3")) 
